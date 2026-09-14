@@ -1,52 +1,23 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MeeLoc — Local Store</title><link rel="stylesheet" href="styles.css"></head><body>
-
-<div class="topbar"><div class="container inner"><div>📍 Deliver to Dubrajpur, Birbhum 731123</div><div>Track Order &nbsp;|&nbsp; Offers &nbsp;|&nbsp; Help &nbsp;|&nbsp; Login / Sign Up</div></div></div>
-<header class="header">
-  <div class="container headrow">
-    <a class="logo" href="index.html"><img src="assets/logo.svg" alt="MeeLoc"></a>
-    <div class="searchbar"><input id="searchInput" placeholder="Search for products, medicines, groceries and more..."><button data-toast="Search demo only for now">Search</button></div>
-    <div class="actions"><a class="actionpill" href="seller-register.html">Sell on MeeLoc</a><button class="actionpill" data-toast="Cart demo — checkout comes in next phase">🛒 My Cart</button></div>
-  </div>
-</header>
-<nav class="nav"><div class="container inner">
-<a href="index.html" class="active">☰ All Categories</a>
-<a href="index.html" class="active">Home</a>
-<a href="index.html#categories">Groceries</a><a href="index.html#categories">Pharmacy</a><a href="index.html#categories">Pet Care</a>
-<a href="index.html#categories">Beauty</a><a href="index.html#categories">Electronics</a><a href="index.html#categories">Home & Kitchen</a>
-<a href="delivery-register.html">Delivery Partner</a><a href="seller-register.html">Store Partner</a>
-</div></nav>
-
-<main class="container">
-<section class="hero">
-  <div class="hero-copy"><div class="eyebrow">FRESH • LOCAL • TRUSTED</div><h1>Daily Essentials<br>Delivered to Your Door</h1><p>Fresh groceries, medicines, pet care and more from trusted local stores around your service PIN.</p><button class="btn green" data-toast="Shopping flow demo — product pages next">Shop Now →</button></div>
-  <div class="hero-art"></div>
-</section>
-<div class="benefits">
-  <div class="benefit"><div class="bicon">🚚</div><div><b>Fast Delivery</b><br><small>in 30 minutes</small></div></div>
-  <div class="benefit"><div class="bicon">🛡️</div><div><b>100% Quality</b><br><small>Products</small></div></div>
-  <div class="benefit"><div class="bicon">🏷️</div><div><b>Best Prices</b><br><small>Everyday</small></div></div>
-  <div class="benefit"><div class="bicon">₹</div><div><b>Secure Payments</b><br><small>UPI, Cards & COD</small></div></div>
-</div>
-
-<section id="categories" class="section">
-  <div class="section-head"><h2>Shop by Category</h2><a href="#">View All →</a></div>
-  <div class="categories"><div class="cat"><div class="pic">🥬</div><span>Groceries</span></div><div class="cat"><div class="pic">💊</div><span>Pharmacy</span></div><div class="cat"><div class="pic">🐶</div><span>Pet Care</span></div><div class="cat"><div class="pic">🍎</div><span>Fruits & Vegetables</span></div><div class="cat"><div class="pic">🥛</div><span>Dairy, Bread & Eggs</span></div><div class="cat"><div class="pic">🍪</div><span>Snacks & Munchies</span></div><div class="cat"><div class="pic">🧴</div><span>Beauty & Personal Care</span></div><div class="cat"><div class="pic">🍳</div><span>Home & Kitchen</span></div><div class="cat"><div class="pic">🎧</div><span>Electronics</span></div><div class="cat"><div class="pic">🍼</div><span>Baby Care</span></div><div class="cat"><div class="pic">👕</div><span>Fashion</span></div><div class="cat"><div class="pic">☕</div><span>Tea, Coffee & Beverages</span></div></div>
-</section>
-
-<section class="section promos">
-  <div class="promo green"><h3>Medicines at<br>Your Doorstep</h3><p>Stay healthy, stay safe. Local pharmacy support with easy ordering.</p><button class="btn outline" data-toast="Medicine category demo">Order Now →</button><img src="assets/medicine.svg" alt=""></div>
-  <div class="promo orange"><h3>Pet Care Supplies</h3><p>Food, treats, toys and essentials for your furry friends.</p><button class="btn orange" data-toast="Pet care category demo">Order Now →</button><img src="assets/pet.svg" alt=""></div>
-</section>
-
-<section class="section join-grid">
-  <div class="join"><div><h3>Become a Delivery Partner</h3><p>Flexible time • Good earnings • Local deliveries</p><p><a class="btn green" href="delivery-register.html">Register Now →</a></p></div><img src="assets/rider.svg" alt=""></div>
-  <div class="join"><div><h3>List Your Store on MeeLoc</h3><p>Grow your business • Reach more customers</p><p><a class="btn orange" href="seller-register.html">Register Your Store →</a></p></div><img src="assets/store.svg" alt=""></div>
-</section>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MeeLoc — Your Local Marketplace</title><meta name="description" content="MeeLoc connects local stores and customers in your service area."><link rel="stylesheet" href="styles.css"></head><body class="storefront-v2">
+<div class="market-top"><div class="container market-top-inner"><div>📍 Deliver to <b>Dubrajpur, Birbhum 731123</b>⌄</div><div class="promo-copy">Get 10% off on your first order &nbsp;|&nbsp; Use Code: <b>MEELOC10</b></div><div><a href="delivery-register.html">Become a Delivery Partner</a> &nbsp;|&nbsp; <a href="seller-register.html">Sell on MeeLoc</a> &nbsp;|&nbsp; Help</div></div></div>
+<header class="market-header"><div class="container market-head-row"><a class="market-logo" href="index.html"><img src="assets/logo.svg" alt="MeeLoc"></a><div class="market-search"><span>⌕</span><input id="searchInput" placeholder="Search for products, groceries, medicines and more..."><button id="searchBtn">Search</button></div><button class="market-account" id="loginBtn"><span class="account-icon">♙</span><span><b>Login / Sign Up</b><small>Account</small></span></button><button class="market-cart" id="cartBtn"><span>🛒</span><span><b>My Cart</b><small><span id="cartCount">0</span> items</small></span></button></div></header>
+<nav class="market-nav"><div class="container market-nav-inner"><a class="allcat" href="#categories">☰ &nbsp; All Categories</a><a class="active" href="index.html">Home</a><a href="#categories">Groceries</a><a href="#categories">Pharmacy</a><a href="#categories">Pet Care</a><a href="#categories">Beauty</a><a href="#categories">Electronics</a><a href="#categories">Home & Kitchen</a><a href="#categories">Fashion</a><a href="#categories">Baby Care</a><a href="#partners">More</a></div></nav>
+<main class="container market-main">
+<section class="market-hero"><div class="market-hero-copy"><span class="mini-label">FRESH • LOCAL • TRUSTED</span><h1>Daily Essentials<br>Delivered to Your Door</h1><p>Fresh groceries, medicines, pet care and daily essentials from trusted local stores around your service PIN.</p><button class="primary-market-btn" data-scroll="#categories">Shop Now →</button><div class="hero-dots"><span></span><i></i><i></i></div></div><div class="hero-photo"><img src="assets/grocery-hero.svg" alt="Fresh groceries"></div><div class="hero-points"><div><b>🌿</b><span>Fresh products<br>from local stores</span></div><div><b>◷</b><span>Quick delivery<br>to your doorstep</span></div><div><b>♥</b><span>Support local<br>businesses</span></div><div><b>🛵</b><span>A stronger local<br>community together</span></div></div></section>
+<section class="market-benefits"><div><span>🚚</span><p><b>Fast Delivery</b><small>in 30 minutes</small></p></div><div><span>♢</span><p><b>100% Quality</b><small>Products</small></p></div><div><span>🏷</span><p><b>Best Prices</b><small>Everyday</small></p></div><div><span>₹</span><p><b>Secure Payments</b><small>UPI, Cards & COD</small></p></div><div><span>🎧</span><p><b>Customer Support</b><small>Local assistance</small></p></div></section>
+<section id="categories" class="market-section"><div class="market-title"><h2>Shop by Category</h2><a href="#products">View All →</a></div><div class="category-grid">
+<button class="category-card searchable-item" data-toast="Groceries category demo"><span class="category-photo">🥬</span><span>Groceries</span></button><button class="category-card searchable-item" data-toast="Pharmacy category demo"><span class="category-photo">💊</span><span>Pharmacy</span></button><button class="category-card searchable-item" data-toast="Pet Care category demo"><span class="category-photo">🐶</span><span>Pet Care</span></button><button class="category-card searchable-item" data-toast="Fruits category demo"><span class="category-photo">🍎</span><span>Fruits & Vegetables</span></button><button class="category-card searchable-item" data-toast="Dairy category demo"><span class="category-photo">🥛</span><span>Dairy, Bread & Eggs</span></button><button class="category-card searchable-item" data-toast="Snacks category demo"><span class="category-photo">🍪</span><span>Snacks & Munchies</span></button><button class="category-card searchable-item" data-toast="Beauty category demo"><span class="category-photo">🧴</span><span>Beauty & Personal Care</span></button><button class="category-card searchable-item" data-toast="Home category demo"><span class="category-photo">🍳</span><span>Home & Kitchen</span></button><button class="category-card searchable-item" data-toast="Electronics category demo"><span class="category-photo">🎧</span><span>Electronics</span></button><button class="category-card searchable-item" data-toast="Baby Care category demo"><span class="category-photo">🍼</span><span>Baby Care</span></button><button class="category-card searchable-item" data-toast="Fashion category demo"><span class="category-photo">👕</span><span>Fashion</span></button><button class="category-card searchable-item" data-toast="Beverages category demo"><span class="category-photo">☕</span><span>Tea, Coffee & Beverages</span></button>
+</div></section>
+<section id="products" class="market-section"><div class="market-title"><div><h2>Popular near you</h2><p>Demo products for the current UI test</p></div><a href="#products">See all products →</a></div><div class="product-grid">
+<div class="product-card searchable-item"><div class="product-pic"><span class="discount">12% OFF</span><span style="font-size:72px">🧺</span></div><span class="eta">⚡ 20–35 min</span><h3>Fresh Vegetables Basket</h3><p>1 combo</p><div class="product-bottom"><div><strong>₹149</strong> <del>₹179</del></div><button class="add-btn" data-product="Fresh Vegetables Basket">ADD</button></div></div>
+<div class="product-card searchable-item"><div class="product-pic"><span class="discount">14% OFF</span><span style="font-size:72px">🥛</span></div><span class="eta">⚡ 20–35 min</span><h3>Daily Essentials Pack</h3><p>1 pack</p><div class="product-bottom"><div><strong>₹299</strong> <del>₹349</del></div><button class="add-btn" data-product="Daily Essentials Pack">ADD</button></div></div>
+<div class="product-card searchable-item"><div class="product-pic"><span class="discount">11% OFF</span><span style="font-size:72px">🐾</span></div><span class="eta">⚡ 20–35 min</span><h3>Pet Care Starter Pack</h3><p>1 pack</p><div class="product-bottom"><div><strong>₹399</strong> <del>₹449</del></div><button class="add-btn" data-product="Pet Care Starter Pack">ADD</button></div></div>
+<div class="product-card searchable-item"><div class="product-pic"><span class="discount">14% OFF</span><span style="font-size:72px">🍎</span></div><span class="eta">⚡ 20–35 min</span><h3>Healthy Fruits Combo</h3><p>1 combo</p><div class="product-bottom"><div><strong>₹189</strong> <del>₹220</del></div><button class="add-btn" data-product="Healthy Fruits Combo">ADD</button></div></div>
+<div class="product-card searchable-item"><div class="product-pic"><span class="discount">15% OFF</span><span style="font-size:72px">🍪</span></div><span class="eta">⚡ 20–35 min</span><h3>Snacks Family Pack</h3><p>1 pack</p><div class="product-bottom"><div><strong>₹179</strong> <del>₹210</del></div><button class="add-btn" data-product="Snacks Family Pack">ADD</button></div></div>
+<div class="product-card searchable-item"><div class="product-pic"><span class="discount">20% OFF</span><span style="font-size:72px">🎧</span></div><span class="eta">⚡ 20–35 min</span><h3>Wireless Audio Essentials</h3><p>1 set</p><div class="product-bottom"><div><strong>₹799</strong> <del>₹999</del></div><button class="add-btn" data-product="Wireless Audio Essentials">ADD</button></div></div>
+</div></section>
+<section class="market-promo-grid"><article class="market-promo medicine"><div><span class="mini-label">HEALTH & WELLNESS</span><h2>Medicines at<br>Your Doorstep</h2><p>Local pharmacy discovery and easy ordering.</p><button class="promo-btn green" data-toast="Pharmacy demo — catalog comes with backend phase">Order Now →</button></div><img src="assets/medicine.svg" alt="Medicines"></article><article class="market-promo petcare"><div><span class="mini-label orange-text">PET CARE</span><h2>Pet Care Supplies</h2><p>Food, treats, toys and everyday pet essentials.</p><button class="promo-btn orange" data-toast="Pet care demo — catalog comes with backend phase">Order Now →</button></div><img src="assets/pet.svg" alt="Pet care"></article></section>
+<section id="partners" class="partner-cta-grid"><article class="partner-cta delivery"><div><h2>Become a Delivery Partner</h2><p>Flexible time • Good earnings • Local deliveries</p><a class="partner-link green" href="delivery-register.html">Register Now →</a><a class="demo-link" href="delivery-dashboard.html">View Demo Dashboard</a></div><img src="assets/rider.svg" alt="MeeLoc delivery partner"></article><article class="partner-cta seller"><div><h2>List Your Store on MeeLoc</h2><p>Grow your business • Reach more customers</p><a class="partner-link orange" href="seller-register.html">Register Your Store →</a><a class="demo-link" href="seller-dashboard.html">View Demo Dashboard</a></div><img src="assets/store.svg" alt="MeeLoc store partner"></article></section>
 </main>
-
-<footer class="footer"><div class="container inner">
-  <img src="assets/logo.svg" alt="MeeLoc">
-  <div class="footer-links"><a href="#">About Us</a><a href="#">Contact</a><a href="#">Terms</a><a href="#">Privacy</a><a href="#">Blog</a></div>
-  <div>© 2026 MeeLoc</div>
-</div></footer><div id="toast" class="toast"></div><script src="script.js"></script>
-</body></html>
+<footer class="market-footer"><div class="container market-footer-inner"><div><img src="assets/logo.svg" alt="MeeLoc"><p>Everything You Need, Near You</p></div><div class="footer-links-v2"><a href="#">About Us</a><a href="#">Contact</a><a href="#">Terms</a><a href="#">Privacy</a><a href="#">Blog</a></div><div><b>Follow Us</b><p>● &nbsp; ◎ &nbsp; ▶ &nbsp; in</p></div></div></footer>
+<div id="uiOverlay" class="ui-overlay" aria-hidden="true"><div class="ui-modal"><button class="modal-close" id="modalClose">×</button><div id="modalContent"></div></div></div><div id="toast" class="toast"></div><script src="script.js"></script></body></html>
