@@ -1,4 +1,3 @@
-
 function toast(msg){
   const el=document.getElementById('toast');
   if(!el) return;
@@ -21,51 +20,79 @@ if(search){
     const q=search.value.toLowerCase().trim();
     document.querySelectorAll('.cat').forEach(c=>{
       c.style.display=(!q||c.innerText.toLowerCase().includes(q))?'block':'none';
-    })
-  })
+    });
+  });
 }
 
-
-// MeeLoc homepage slider: autoplay, arrows, dots, keyboard and swipe.
+// MeeLoc homepage slider: continuous autoplay + arrows + dots + keyboard + swipe.
 (function(){
   const slider=document.querySelector('.hero-slider');
   if(!slider) return;
+
   const slides=[...slider.querySelectorAll('.slide')];
   const dots=[...slider.querySelectorAll('.dot')];
   const prev=slider.querySelector('.slider-arrow.prev');
   const next=slider.querySelector('.slider-arrow.next');
-  let index=0, timer=null, startX=0;
-  const AUTOPLAY=4500;
+  if(slides.length<2) return;
+
+  let index=0;
+  let timer=null;
+  let startX=0;
+  const AUTOPLAY=4000;
 
   function show(i){
     index=(i+slides.length)%slides.length;
-    slides.forEach((s,n)=>s.classList.toggle('active',n===index));
-    dots.forEach((d,n)=>{
-      const on=n===index;
-      d.classList.toggle('active',on);
-      d.setAttribute('aria-selected',on?'true':'false');
+    slides.forEach((slide,n)=>slide.classList.toggle('active',n===index));
+    dots.forEach((dot,n)=>{
+      const active=n===index;
+      dot.classList.toggle('active',active);
+      dot.setAttribute('aria-selected',active?'true':'false');
     });
   }
-  function stop(){ if(timer){clearInterval(timer);timer=null;} }
-  function start(){ stop(); timer=setInterval(()=>show(index+1),AUTOPLAY); }
-  function go(i){ show(i); start(); }
+
+  function stop(){
+    if(timer){
+      clearInterval(timer);
+      timer=null;
+    }
+  }
+
+  function start(){
+    stop();
+    timer=setInterval(()=>show(index+1),AUTOPLAY);
+  }
+
+  function go(i){
+    show(i);
+    start();
+  }
 
   prev?.addEventListener('click',()=>go(index-1));
   next?.addEventListener('click',()=>go(index+1));
-  dots.forEach((d,n)=>d.addEventListener('click',()=>go(n)));
-  slider.addEventListener('mouseenter',stop);
-  slider.addEventListener('mouseleave',start);
-  slider.addEventListener('focusin',stop);
-  slider.addEventListener('focusout',start);
+  dots.forEach((dot,n)=>dot.addEventListener('click',()=>go(n)));
+
+  // Keep autoplay running even when the mouse is over the banner.
   slider.addEventListener('keydown',e=>{
     if(e.key==='ArrowLeft') go(index-1);
     if(e.key==='ArrowRight') go(index+1);
   });
-  slider.addEventListener('touchstart',e=>{startX=e.changedTouches[0].clientX;stop();},{passive:true});
+
+  slider.addEventListener('touchstart',e=>{
+    startX=e.changedTouches[0].clientX;
+    stop();
+  },{passive:true});
+
   slider.addEventListener('touchend',e=>{
     const dx=e.changedTouches[0].clientX-startX;
     if(Math.abs(dx)>45) show(index+(dx<0?1:-1));
     start();
   },{passive:true});
-  show(0); start();
+
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden) stop();
+    else start();
+  });
+
+  show(0);
+  start();
 })();
