@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="320" viewBox="0 0 500 320">
+<rect width="500" height="320" rx="28" fill="#fff4e5"/>
+<g transform="translate(95 45)">
+<rect x="45" y="95" width="220" height="150" rx="8" fill="#f5d3a7"/>
+<rect x="65" y="135" width="70" height="70" fill="#8ad2f2"/><rect x="175" y="125" width="55" height="120" fill="#9a5c2e"/>
+<path d="M35 95h240l-25-55H60z" fill="#fff"/><path d="M35 95h48l-10-55H60zM131 95h48l-8-55h-42zM227 95h48l-25-55h-13z" fill="#f57a22"/>
+<rect x="95" y="10" width="120" height="45" rx="10" fill="#0b7a46"/><text x="120" y="40" fill="white" font-size="25" font-family="Arial" font-weight="700">MeeLoc</text>
+<g fill="#34a85e"><circle cx="25" cy="210" r="30"/><circle cx="290" cy="205" r="33"/></g>
+</g>
+</svg>

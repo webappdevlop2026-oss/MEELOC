@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="320" viewBox="0 0 500 320">
+<rect width="500" height="320" rx="28" fill="#ddf6e5"/>
+<g transform="translate(95 55)">
+<circle cx="90" cy="190" r="42" fill="#17372c"/><circle cx="270" cy="190" r="42" fill="#17372c"/>
+<path d="M95 190h130l45-80h-80l-25 45h-70z" fill="#0f8c50"/><rect x="130" y="85" width="90" height="80" rx="18" fill="#0f8c50"/>
+<rect x="175" y="15" width="95" height="90" rx="14" fill="#087443"/><text x="190" y="68" fill="white" font-size="22" font-family="Arial" font-weight="700">MeeLoc</text>
+<circle cx="135" cy="60" r="28" fill="#d39a6a"/><path d="M110 45c15-32 55-28 58 0z" fill="#0a6f43"/>
+<path d="M135 88l50 52" stroke="#333" stroke-width="12" stroke-linecap="round"/>
+</g>
+</svg>
