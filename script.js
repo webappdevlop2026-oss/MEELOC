@@ -31,7 +31,7 @@ document.querySelectorAll('.cat[data-cat]').forEach(card=>{
       window.location.href='fashion.html';
       return;
     }
-    toast(category+' catalogue will open here when live seller products are connected.');
+    window.location.href='category.html?cat='+encodeURIComponent(category);
   });
 });
 
