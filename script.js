@@ -25,7 +25,14 @@ if(search){
 }
 
 document.querySelectorAll('.cat[data-cat]').forEach(card=>{
-  card.addEventListener('click',()=>toast(card.dataset.cat+' catalogue will open here when live seller products are connected.'));
+  card.addEventListener('click',()=>{
+    const category=(card.dataset.cat||'').trim();
+    if(category==='Fashion'){
+      window.location.href='fashion.html';
+      return;
+    }
+    toast(category+' catalogue will open here when live seller products are connected.');
+  });
 });
 
 // PIN selector. Launch area is currently Dubrajpur 731123.
