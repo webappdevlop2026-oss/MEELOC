@@ -1,68 +1,61 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MeeLoc — Local Store</title><link rel="stylesheet" href="styles.css"></head><body>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="MeeLoc — your local marketplace for Dubrajpur. Shop groceries, food, medicines, electronics and local services from nearby sellers."><title>MeeLoc — Your Local Marketplace</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="home-upgrade.css"></head><body>
 
-<div class="topbar"><div class="container inner"><div>📍 Deliver to Dubrajpur, Birbhum 731123</div><div>Track Order &nbsp;|&nbsp; Offers &nbsp;|&nbsp; Help &nbsp;|&nbsp; Login / Sign Up</div></div></div>
+<div class="topbar"><div class="container inner"><div class="location-inline">📍 Deliver to <strong id="activePinLabel">731123 — Dubrajpur, Birbhum</strong><button class="pin-change" id="openPin" type="button">Change PIN</button></div><div>Track Order &nbsp;|&nbsp; Offers &nbsp;|&nbsp; Help &nbsp;|&nbsp; Login / Sign Up</div></div></div>
 <header class="header">
   <div class="container headrow">
-    <a class="logo" href="index.html"><img src="assets/logo.svg" alt="MeeLoc"></a>
-    <div class="searchbar"><input id="searchInput" placeholder="Search for products, medicines, groceries and more..."><button data-toast="Search demo only for now">Search</button></div>
-    <div class="actions"><a class="actionpill" href="seller-register.html">Sell on MeeLoc</a><button class="actionpill" data-toast="Cart demo — checkout comes in next phase">🛒 My Cart</button></div>
+    <a class="logo" href="index.html"><img src="assets/logo.svg" alt="MeeLoc — Your Local Marketplace"></a>
+    <div class="searchbar"><input id="searchInput" placeholder="Search products, services, shops and more..."><button data-toast="Search demo is ready — live catalogue connects with backend in the next phase">Search</button></div>
+    <div class="actions"><a class="actionpill" href="seller-register.html">🏪 Sell on MeeLoc</a><button class="actionpill" data-toast="Cart demo — checkout will connect with live products in backend phase">🛒 My Cart</button></div>
   </div>
 </header>
 <nav class="nav"><div class="container inner">
-<a href="index.html" class="active">☰ All Categories</a>
-<a href="index.html" class="active">Home</a>
-<a href="index.html#categories">Groceries</a><a href="index.html#categories">Pharmacy</a><a href="index.html#categories">Pet Care</a>
-<a href="index.html#categories">Beauty</a><a href="index.html#categories">Electronics</a><a href="index.html#categories">Home & Kitchen</a>
-<a href="delivery-register.html">Delivery Partner</a><a href="seller-register.html">Store Partner</a>
+<a href="#categories" class="active">☰ All Categories</a><a href="index.html" class="active">Home</a><a href="#categories">Grocery</a><a href="#categories">Food</a><a href="#categories">Medicines</a><a href="#categories">Home Services</a><a href="#categories">Electronics</a><a href="#categories">Fashion</a><a href="#categories">Education</a><a href="delivery-register.html">Delivery Partner</a><a href="seller-register.html">Store Partner</a>
 </div></nav>
 
 <main class="container">
-<section class="hero-slider" aria-label="MeeLoc highlights">
+<section class="hero-slider" aria-label="MeeLoc highlights" tabindex="0">
   <div class="slider-track">
-    <a class="slide active" href="#categories" aria-label="Shop local with MeeLoc">
-      <img src="assets/slider-shop-local.png" alt="Shop Local, Live Better with MeeLoc">
-    </a>
-    <a class="slide" href="seller-register.html" aria-label="Register your store on MeeLoc">
-      <img src="assets/slider-seller.png" alt="Join MeeLoc as a Seller">
-    </a>
-    <a class="slide" href="delivery-register.html" aria-label="Join MeeLoc as a delivery partner">
-      <img src="assets/slider-delivery.png" alt="Join MeeLoc as a Delivery Partner">
-    </a>
+    <a class="slide active" href="#categories" aria-label="Shop local with MeeLoc"><img src="assets/slider-shop-local.png" alt="Shop Local, Live Better with MeeLoc"></a>
+    <a class="slide" href="seller-register.html" aria-label="Register your store on MeeLoc"><img src="assets/slider-seller.png" alt="Join MeeLoc as a Seller"></a>
+    <a class="slide" href="delivery-register.html" aria-label="Join MeeLoc as a delivery partner"><img src="assets/slider-delivery.png" alt="Join MeeLoc as a Delivery Partner"></a>
   </div>
-  <button class="slider-arrow prev" type="button" aria-label="Previous slide">‹</button>
-  <button class="slider-arrow next" type="button" aria-label="Next slide">›</button>
-  <div class="slider-dots" role="tablist" aria-label="Choose slide">
-    <button class="dot active" type="button" aria-label="Slide 1" aria-selected="true"></button>
-    <button class="dot" type="button" aria-label="Slide 2" aria-selected="false"></button>
-    <button class="dot" type="button" aria-label="Slide 3" aria-selected="false"></button>
-  </div>
+  <button class="slider-arrow prev" type="button" aria-label="Previous slide">‹</button><button class="slider-arrow next" type="button" aria-label="Next slide">›</button>
+  <div class="slider-dots" role="tablist" aria-label="Choose slide"><button class="dot active" type="button" aria-label="Slide 1" aria-selected="true"></button><button class="dot" type="button" aria-label="Slide 2" aria-selected="false"></button><button class="dot" type="button" aria-label="Slide 3" aria-selected="false"></button></div>
 </section>
-<div class="benefits">
-  <div class="benefit"><div class="bicon">🚚</div><div><b>Fast Delivery</b><br><small>in 30 minutes</small></div></div>
-  <div class="benefit"><div class="bicon">🛡️</div><div><b>100% Quality</b><br><small>Products</small></div></div>
-  <div class="benefit"><div class="bicon">🏷️</div><div><b>Best Prices</b><br><small>Everyday</small></div></div>
-  <div class="benefit"><div class="bicon">₹</div><div><b>Secure Payments</b><br><small>UPI, Cards & COD</small></div></div>
-</div>
+
+<div class="launch-strip"><div><b>🚀 Launching first in Dubrajpur — PIN 731123</b><br><span>Approved local sellers serving this PIN will be visible to customers across the covered area.</span></div><div class="launch-badge">Same Town • Same Trust</div></div>
+
+<div class="benefits"><div class="benefit"><div class="bicon">🚚</div><div><b>Fast Local Delivery</b><br><small>Nearby seller network</small></div></div><div class="benefit"><div class="bicon">🏪</div><div><b>Support Local Shops</b><br><small>Shop from your own town</small></div></div><div class="benefit"><div class="bicon">🏷️</div><div><b>Local Deals</b><br><small>Offers around your PIN</small></div></div><div class="benefit"><div class="bicon">₹</div><div><b>Secure Payments</b><br><small>UPI, Cards & COD</small></div></div></div>
 
 <section id="categories" class="section">
-  <div class="section-head"><h2>Shop by Category</h2><a href="#">View All →</a></div>
-  <div class="categories"><div class="cat"><div class="pic">🥬</div><span>Groceries</span></div><div class="cat"><div class="pic">💊</div><span>Pharmacy</span></div><div class="cat"><div class="pic">🐶</div><span>Pet Care</span></div><div class="cat"><div class="pic">🍎</div><span>Fruits & Vegetables</span></div><div class="cat"><div class="pic">🥛</div><span>Dairy, Bread & Eggs</span></div><div class="cat"><div class="pic">🍪</div><span>Snacks & Munchies</span></div><div class="cat"><div class="pic">🧴</div><span>Beauty & Personal Care</span></div><div class="cat"><div class="pic">🍳</div><span>Home & Kitchen</span></div><div class="cat"><div class="pic">🎧</div><span>Electronics</span></div><div class="cat"><div class="pic">🍼</div><span>Baby Care</span></div><div class="cat"><div class="pic">👕</div><span>Fashion</span></div><div class="cat"><div class="pic">☕</div><span>Tea, Coffee & Beverages</span></div></div>
+  <div class="section-head rich"><div><div class="category-kicker">Explore MeeLoc</div><h2>Shop & Book by Category</h2><p class="section-copy">Products and local services together in one marketplace — starting from Dubrajpur.</p></div><a href="#categories">View All →</a></div>
+  <div class="categories market-categories">
+    <div class="cat" data-cat="Grocery"><div class="pic">🥬</div><span>Grocery & Daily Market</span></div>
+    <div class="cat" data-cat="Food"><div class="pic">🍛</div><span>Food & Restaurants</span></div>
+    <div class="cat" data-cat="Medicines"><div class="pic">💊</div><span>Medicines & Health</span></div>
+    <div class="cat" data-cat="Home Service"><div class="pic">🧰</div><span>Home Services</span></div>
+    <div class="cat" data-cat="Electronics"><div class="pic">🎧</div><span>Electronics</span></div>
+    <div class="cat" data-cat="Fashion"><div class="pic">👕</div><span>Fashion & Clothing</span></div>
+    <div class="cat" data-cat="Cyber Cafe"><div class="pic">💻</div><span>Online Cyber Cafe</span></div>
+    <div class="cat" data-cat="Chicken Shop"><div class="pic">🍗</div><span>Chicken, Fish & Meat</span></div>
+    <div class="cat" data-cat="Tuition"><div class="pic">📚</div><span>Tuition & Coaching</span></div>
+    <div class="cat" data-cat="School Admission"><div class="pic">🏫</div><span>School Admission</span></div>
+    <div class="cat" data-cat="Furniture"><div class="pic">🛋️</div><span>Furniture</span></div>
+    <div class="cat" data-cat="Decorator"><div class="pic">🎨</div><span>Decorator Service</span></div>
+  </div>
 </section>
 
-<section class="section promos">
-  <div class="promo green"><h3>Medicines at<br>Your Doorstep</h3><p>Stay healthy, stay safe. Local pharmacy support with easy ordering.</p><button class="btn outline" data-toast="Medicine category demo">Order Now →</button><img src="assets/medicine.svg" alt=""></div>
-  <div class="promo orange"><h3>Pet Care Supplies</h3><p>Food, treats, toys and essentials for your furry friends.</p><button class="btn orange" data-toast="Pet care category demo">Order Now →</button><img src="assets/pet.svg" alt=""></div>
-</section>
+<div class="local-info"><div class="local-card"><div class="local-icon">📍</div><div><b>PIN-based serviceability</b><span>Customers see sellers that serve their selected PIN.</span></div></div><div class="local-card"><div class="local-icon">🛵</div><div><b>Bike & 4-wheeler delivery</b><span>Vehicle type can match order size, weight and distance.</span></div></div><div class="local-card"><div class="local-icon">✅</div><div><b>Approved local sellers</b><span>Seller visibility stays controlled through the MeeLoc admin.</span></div></div><div class="local-card"><div class="local-icon">🛒</div><div><b>One local marketplace</b><span>Products, food and services in one shopping experience.</span></div></div></div>
 
-<section class="section join-grid">
-  <div class="join"><div><h3>Become a Delivery Partner</h3><p>Flexible time • Good earnings • Local deliveries</p><p><a class="btn green" href="delivery-register.html">Register Now →</a></p></div><img src="assets/rider.svg" alt=""></div>
-  <div class="join"><div><h3>List Your Store on MeeLoc</h3><p>Grow your business • Reach more customers</p><p><a class="btn orange" href="seller-register.html">Register Your Store →</a></p></div><img src="assets/store.svg" alt=""></div>
-</section>
+<section class="section promos"><div class="promo green"><h3>Medicines at<br>Your Doorstep</h3><p>Order from supported local pharmacies in your active service PIN.</p><button class="btn outline" data-toast="Medicine category demo">Order Now →</button><img src="assets/medicine.svg" alt="Medicine delivery"></div><div class="promo orange"><h3>Pet Care Supplies</h3><p>Food, treats, toys and essentials from local sellers.</p><button class="btn orange" data-toast="Pet care category demo">Order Now →</button><img src="assets/pet.svg" alt="Pet care"></div></section>
+
+<section class="seller-callout"><div class="copy"><div class="eyebrow-mini">Grow with MeeLoc</div><h3>Local shop owners can join the marketplace</h3><p>Register your store, serve customers around your active PIN and manage orders from the MeeLoc seller panel.</p><div class="seller-actions"><a class="btn orange" href="seller-register.html">Register Your Store →</a><a class="btn outline" href="delivery-register.html">Join as Delivery Partner</a></div></div><div class="art"><img src="assets/store.svg" alt="Local store on MeeLoc"></div></section>
+
+<section class="section join-grid"><div class="join"><div><h3>Become a Delivery Partner</h3><p>Flexible time • Local deliveries • Earn in your area</p><p><a class="btn green" href="delivery-register.html">Register Now →</a></p></div><img src="assets/rider.svg" alt="MeeLoc delivery partner"></div><div class="join"><div><h3>List Your Store on MeeLoc</h3><p>Grow your business • Reach nearby customers</p><p><a class="btn orange" href="seller-register.html">Register Your Store →</a></p></div><img src="assets/store.svg" alt="MeeLoc seller"></div></section>
 </main>
 
-<footer class="footer"><div class="container inner">
-  <img src="assets/logo.svg" alt="MeeLoc">
-  <div class="footer-links"><a href="#">About Us</a><a href="#">Contact</a><a href="#">Terms</a><a href="#">Privacy</a><a href="#">Blog</a></div>
-  <div>© 2026 MeeLoc</div>
-</div></footer><div id="toast" class="toast"></div><script src="script.js"></script>
+<footer class="footer"><div class="container inner"><img src="assets/logo.svg" alt="MeeLoc"><div class="footer-links"><a href="#">About Us</a><a href="#">Contact</a><a href="#">Terms</a><a href="#">Privacy</a><a href="#">Blog</a></div><div>© 2026 MeeLoc • Dubrajpur, Birbhum, West Bengal</div></div></footer>
+
+<div class="pin-panel" id="pinPanel" aria-hidden="true"><div class="pin-card"><h3>Choose your delivery PIN</h3><p>MeeLoc is starting from Dubrajpur. Enter your PIN to check service availability.</p><div class="pin-row"><input id="pinInput" inputmode="numeric" maxlength="6" placeholder="Enter 6-digit PIN"><button id="checkPin" type="button">Check</button></div><div class="pin-result" id="pinResult"></div><button class="pin-close" id="closePin" type="button">Close</button></div></div>
+<div id="toast" class="toast"></div><script src="script.js"></script>
 </body></html>
