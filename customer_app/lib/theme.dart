@@ -32,10 +32,14 @@ ThemeData meelocTheme() => ThemeData(
       ),
     );
 
-/// Grey rounded search bar.
+/// Grey rounded search bar. With [onTap] it acts as a button (opens search page).
 class MSearchBar extends StatelessWidget {
   final String hint;
-  const MSearchBar({super.key, required this.hint});
+  final VoidCallback? onTap;
+  final ValueChanged<String>? onChanged;
+  final TextEditingController? controller;
+  final bool autofocus;
+  const MSearchBar({super.key, required this.hint, this.onTap, this.onChanged, this.controller, this.autofocus = false});
   @override
   Widget build(BuildContext context) => Container(
         height: 42,
@@ -46,6 +50,12 @@ class MSearchBar extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: TextField(
+              controller: controller,
+              autofocus: autofocus,
+              readOnly: onTap != null,
+              onTap: onTap,
+              onChanged: onChanged,
+              textInputAction: TextInputAction.search,
               decoration: InputDecoration(
                 hintText: hint,
                 hintStyle: const TextStyle(fontSize: 13, color: MC.sub),
@@ -157,4 +167,82 @@ void mSnack(BuildContext context, String msg) {
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
     ..showSnackBar(SnackBar(content: Text(msg), duration: const Duration(seconds: 1)));
+}
+
+/// Simple empty state.
+class MEmpty extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  const MEmpty({super.key, required this.icon, required this.text});
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 70),
+        child: Column(children: [
+          Icon(icon, size: 60, color: MC.line),
+          const SizedBox(height: 10),
+          Text(text, textAlign: TextAlign.center, style: const TextStyle(color: MC.sub)),
+        ]),
+      );
+}
+
+/// Labeled outlined text field used in forms.
+class MField extends StatelessWidget {
+  final String label;
+  final TextEditingController controller;
+  final TextInputType? keyboard;
+  final int maxLines;
+  final String? hint;
+  final Widget? suffix;
+  final bool readOnly;
+  final VoidCallback? onTap;
+  const MField({
+    super.key,
+    required this.label,
+    required this.controller,
+    this.keyboard,
+    this.maxLines = 1,
+    this.hint,
+    this.suffix,
+    this.readOnly = false,
+    this.onTap,
+  });
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(top: 14),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 6),
+          TextField(
+            controller: controller,
+            keyboardType: keyboard,
+            maxLines: maxLines,
+            readOnly: readOnly,
+            onTap: onTap,
+            decoration: InputDecoration(
+              hintText: hint,
+              isDense: true,
+              suffixIcon: suffix,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: MC.line)),
+            ),
+          ),
+        ]),
+      );
+}
+
+Future<bool> mConfirm(BuildContext context, String title, String msg, {String ok = 'Yes'}) async {
+  final r = await showDialog<bool>(
+    context: context,
+    builder: (c) => AlertDialog(
+      title: Text(title),
+      content: Text(msg),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Cancel')),
+        TextButton(onPressed: () => Navigator.pop(c, true), child: Text(ok)),
+      ],
+    ),
+  );
+  return r ?? false;
 }

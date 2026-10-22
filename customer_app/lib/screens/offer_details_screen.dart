@@ -1,13 +1,69 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../theme.dart';
 import '../data.dart';
-import 'home_screen.dart';
+import '../state.dart';
+import '../widgets.dart';
 
 class OfferDetailsScreen extends StatelessWidget {
   final Shop shop;
   const OfferDetailsScreen({super.key, required this.shop});
 
-  String get _pct => RegExp(r'\d+%').firstMatch(shop.offer)?.group(0) ?? shop.offer;
+  String get _pct => RegExp(r'(\d+%|₹\d+)').firstMatch(shop.offer)?.group(0) ?? shop.offer;
+
+  Future<void> _open(BuildContext context, Uri uri) async {
+    try {
+      final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!ok && context.mounted) mSnack(context, 'Could not open');
+    } catch (_) {
+      if (context.mounted) mSnack(context, 'Could not open');
+    }
+  }
+
+  void _claim(BuildContext context) {
+    final c = app.claim(shop);
+    showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      builder: (s) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            const Icon(Icons.check_circle, color: MC.green, size: 56),
+            const SizedBox(height: 8),
+            const Text('Offer Claimed!', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 4),
+            Text('Show this code at ${shop.name}', style: const TextStyle(color: MC.sub)),
+            const SizedBox(height: 16),
+            InkWell(
+              onTap: () {
+                Clipboard.setData(ClipboardData(text: c.code));
+                mSnack(context, 'Code copied');
+              },
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE8F6EE),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: MC.green),
+                ),
+                child: Column(children: [
+                  Text(c.code,
+                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, letterSpacing: 2, color: MC.green)),
+                  const SizedBox(height: 4),
+                  const Text('Tap to copy', style: TextStyle(fontSize: 12, color: MC.sub)),
+                ]),
+              ),
+            ),
+            const SizedBox(height: 16),
+            MPrimaryButton(label: 'Done', onTap: () => Navigator.pop(s)),
+          ]),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,8 +73,9 @@ class OfferDetailsScreen extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           Stack(children: [
-            Image.asset(isTasty ? 'assets/images/food_header.png' : shop.image,
-                height: 230, width: double.infinity, fit: BoxFit.cover),
+            isTasty
+                ? Image.asset('assets/images/food_header.png', height: 230, width: double.infinity, fit: BoxFit.cover)
+                : ShopImage(shop: shop, width: double.infinity, height: 230, radius: 0),
             Positioned(
               top: MediaQuery.of(context).padding.top + 6,
               left: 8,
@@ -26,7 +83,11 @@ class OfferDetailsScreen extends StatelessWidget {
               child: Row(children: [
                 _round(Icons.chevron_left, () => Navigator.pop(context)),
                 const Spacer(),
-                _round(Icons.ios_share_rounded, () => mSnack(context, 'Share link copied')),
+                _round(Icons.ios_share_rounded, () {
+                  Clipboard.setData(ClipboardData(
+                      text: '${shop.name}: ${shop.offer} ${shop.offerNote} – Meeloc app e dekhun! https://meeloc.vercel.app'));
+                  mSnack(context, 'Offer link copied – share it anywhere');
+                }),
               ]),
             ),
             Positioned(left: 14, bottom: 14, child: OffBadge(text: '$_pct OFF')),
@@ -35,9 +96,7 @@ class OfferDetailsScreen extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
-                Expanded(
-                  child: Text(shop.name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
-                ),
+                Expanded(child: Text(shop.name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700))),
                 const Icon(Icons.location_on_outlined, size: 14, color: MC.sub),
                 Text(shop.distance, style: const TextStyle(fontSize: 12, color: MC.sub)),
               ]),
@@ -49,11 +108,11 @@ class OfferDetailsScreen extends StatelessWidget {
               ]),
               const SizedBox(height: 16),
               Row(children: [
-                _info(Icons.discount_outlined, '$_pct OFF', 'On Total Bill'),
+                _info(Icons.discount_outlined, '$_pct OFF', shop.offerNote),
                 const SizedBox(width: 10),
                 _info(Icons.event_note_outlined, 'Valid Till', shop.validTill),
                 const SizedBox(width: 10),
-                _info(Icons.restaurant_outlined, shop.mode, 'Only'),
+                _info(shop.mode == 'Dine In' ? Icons.restaurant_outlined : Icons.store_outlined, shop.mode, 'Only'),
               ]),
               const SizedBox(height: 20),
               const Text('About This Offer', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
@@ -63,37 +122,37 @@ class OfferDetailsScreen extends StatelessWidget {
               Row(children: [
                 Expanded(
                   child: MOutlineButton(
-                      label: 'Call', icon: Icons.call_outlined, onTap: () => mSnack(context, 'Calling ${shop.name}...')),
+                      label: 'Call', icon: Icons.call_outlined, onTap: () => _open(context, Uri.parse('tel:${shop.phone}'))),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: MOutlineButton(
-                      label: 'Directions',
-                      icon: Icons.directions_outlined,
-                      onTap: () => mSnack(context, 'Opening maps...')),
+                    label: 'Directions',
+                    icon: Icons.directions_outlined,
+                    onTap: () => _open(
+                      context,
+                      Uri.parse('https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent('${shop.name} ${app.location}')}'),
+                    ),
+                  ),
                 ),
               ]),
               const SizedBox(height: 14),
-              MPrimaryButton(
-                label: 'Claim Offer',
-                onTap: () => showDialog(
-                  context: context,
-                  builder: (_) => AlertDialog(
-                    title: const Text('Offer Claimed!'),
-                    content: Text('Show this code at ${shop.name}:\n\nMEELOC-${shop.name.hashCode.abs() % 100000}'),
-                    actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
-                  ),
-                ),
+              ListenableBuilder(
+                listenable: app,
+                builder: (_, __) {
+                  final claimed = app.claimed.any((c) => c.shop.name == shop.name);
+                  return MPrimaryButton(label: claimed ? 'View Offer Code' : 'Claim Offer', onTap: () => _claim(context));
+                },
               ),
               const SizedBox(height: 12),
-              ValueListenableBuilder<Set<String>>(
-                valueListenable: savedShops,
-                builder: (_, saved, __) {
-                  final on = saved.contains(shop.name);
+              ListenableBuilder(
+                listenable: app,
+                builder: (_, __) {
+                  final on = app.saved.contains(shop.name);
                   return MOutlineButton(
                     label: on ? 'Saved' : 'Save Offer',
                     icon: on ? Icons.favorite : Icons.favorite_border,
-                    onTap: () => toggleSaved(shop.name),
+                    onTap: () => app.toggleSaved(shop.name),
                   );
                 },
               ),
@@ -112,13 +171,17 @@ class OfferDetailsScreen extends StatelessWidget {
 
   Widget _info(IconData icon, String a, String b) => Expanded(
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(color: MC.bg, borderRadius: BorderRadius.circular(10), border: Border.all(color: MC.line)),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+          decoration:
+              BoxDecoration(color: MC.bg, borderRadius: BorderRadius.circular(10), border: Border.all(color: MC.line)),
           child: Column(children: [
             Icon(icon, size: 26, color: MC.text),
             const SizedBox(height: 6),
             Text(a, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-            Text(b, style: const TextStyle(fontSize: 11, color: MC.sub)),
+            Text(b,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 11, color: MC.sub)),
           ]),
         ),
       );

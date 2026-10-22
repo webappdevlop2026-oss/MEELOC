@@ -1,94 +1,113 @@
 import 'package:flutter/material.dart';
 import '../theme.dart';
+import '../state.dart';
+import 'order_screens.dart';
+import 'more_screens.dart';
+import 'welcome_screen.dart';
 
-class PartnerDashboardScreen extends StatefulWidget {
+class PartnerDashboardScreen extends StatelessWidget {
   const PartnerDashboardScreen({super.key});
+
+  void _go(BuildContext c, Widget w) => Navigator.push(c, MaterialPageRoute(builder: (_) => w));
+
   @override
-  State<PartnerDashboardScreen> createState() => _PartnerDashboardScreenState();
-}
-
-class _PartnerDashboardScreenState extends State<PartnerDashboardScreen> {
-  bool online = true;
-
-  void _orders(String title, List<String> items) => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => Scaffold(
-            appBar: AppBar(title: Text(title)),
-            body: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                for (final o in items)
-                  Card(
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10), side: const BorderSide(color: MC.line)),
-                    child: ListTile(
-                      leading: const Icon(Icons.delivery_dining, color: MC.green),
-                      title: Text(o),
-                      subtitle: const Text('Dubrajpur · 1.2 km'),
-                      trailing: const Icon(Icons.chevron_right),
-                    ),
-                  ),
-              ],
-            ),
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: partner,
+        builder: (context, _) => Scaffold(
+          appBar: AppBar(
+            centerTitle: false,
+            title: const Text('Partner Dashboard'),
+            actions: [
+              Text(partner.online ? 'Online' : 'Offline',
+                  style: TextStyle(
+                      fontSize: 13, color: partner.online ? MC.green : MC.sub, fontWeight: FontWeight.w600)),
+              Switch(value: partner.online, activeTrackColor: MC.green, onChanged: partner.setOnline),
+              const SizedBox(width: 6),
+            ],
           ),
-        ),
-      );
-
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          centerTitle: false,
-          title: const Text('Partner Dashboard'),
-          actions: [
-            Text(online ? 'Online' : 'Offline',
-                style: TextStyle(fontSize: 13, color: online ? MC.text : MC.sub, fontWeight: FontWeight.w500)),
-            Switch(value: online, activeTrackColor: MC.green, onChanged: (v) => setState(() => online = v)),
-            const SizedBox(width: 6),
-          ],
-        ),
-        body: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 6, 16, 20),
-          children: [
-            const Row(children: [
-              _Tile(icon: Icons.inventory_2, color: MC.blue, value: '5', label: "Today's Orders"),
-              SizedBox(width: 10),
-              _Tile(icon: Icons.currency_rupee, color: MC.blue, value: '₹320', label: "Today's Earnings", noIcon: true),
-            ]),
-            const SizedBox(height: 10),
-            const Row(children: [
-              _Tile(icon: Icons.verified, color: MC.green, value: '12', label: 'Total Deliveries'),
-              SizedBox(width: 10),
-              _Tile(icon: Icons.local_fire_department, color: MC.orange, value: '4.8', label: 'Rating'),
-            ]),
-            const SizedBox(height: 16),
-            Container(
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), border: Border.all(color: MC.line)),
-              clipBehavior: Clip.antiAlias,
-              child: Column(children: [
-                MMenuTile(
-                  icon: Icons.receipt_outlined,
-                  title: 'New Orders',
-                  badge: 2,
-                  onTap: () => _orders('New Orders', ['Order #MLC1021', 'Order #MLC1022']),
+          body: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 6, 16, 20),
+            children: [
+              if (!partner.online)
+                Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(color: const Color(0xFFFFF4E5), borderRadius: BorderRadius.circular(10)),
+                  child: const Row(children: [
+                    Icon(Icons.info_outline, color: MC.orange),
+                    SizedBox(width: 8),
+                    Expanded(child: Text('You are offline. Go online to receive new orders.')),
+                  ]),
                 ),
-                MMenuTile(
-                  icon: Icons.local_shipping_outlined,
-                  title: 'Ongoing Orders',
-                  badge: 1,
-                  onTap: () => _orders('Ongoing Orders', ['Order #MLC1019']),
-                ),
-                MMenuTile(
-                  icon: Icons.check,
-                  title: 'Completed Orders',
-                  onTap: () => _orders('Completed Orders', [for (int i = 1; i <= 12; i++) 'Order #MLC10${i.toString().padLeft(2, '0')}']),
-                ),
-                const MMenuTile(icon: Icons.account_balance_wallet_outlined, title: 'Earnings'),
-                const MMenuTile(icon: Icons.person_outline, title: 'Profile & Documents'),
+              Row(children: [
+                _Tile(
+                    icon: Icons.inventory_2,
+                    color: MC.blue,
+                    value: '${partner.todayDone.length + partner.ongoing.length}',
+                    label: "Today's Orders"),
+                const SizedBox(width: 10),
+                _Tile(
+                    icon: Icons.currency_rupee,
+                    color: MC.blue,
+                    value: '₹${partner.todayEarnings}',
+                    label: "Today's Earnings",
+                    noIcon: true),
               ]),
-            ),
-          ],
+              const SizedBox(height: 10),
+              Row(children: [
+                _Tile(icon: Icons.verified, color: MC.green, value: '${partner.completed.length}', label: 'Total Deliveries'),
+                const SizedBox(width: 10),
+                _Tile(icon: Icons.local_fire_department, color: MC.orange, value: '${partner.rating}', label: 'Rating'),
+              ]),
+              const SizedBox(height: 16),
+              Container(
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), border: Border.all(color: MC.line)),
+                clipBehavior: Clip.antiAlias,
+                child: Column(children: [
+                  MMenuTile(
+                    icon: Icons.receipt_outlined,
+                    title: 'New Orders',
+                    badge: partner.newOrders.isEmpty ? null : partner.newOrders.length,
+                    onTap: () => _go(context, const OrdersListScreen(kind: 'new')),
+                  ),
+                  MMenuTile(
+                    icon: Icons.local_shipping_outlined,
+                    title: 'Ongoing Orders',
+                    badge: partner.ongoing.isEmpty ? null : partner.ongoing.length,
+                    onTap: () => _go(context, const OrdersListScreen(kind: 'ongoing')),
+                  ),
+                  MMenuTile(
+                    icon: Icons.check,
+                    title: 'Completed Orders',
+                    onTap: () => _go(context, const OrdersListScreen(kind: 'completed')),
+                  ),
+                  MMenuTile(
+                    icon: Icons.account_balance_wallet_outlined,
+                    title: 'Earnings',
+                    onTap: () => _go(context, const EarningsScreen()),
+                  ),
+                  MMenuTile(
+                    icon: Icons.person_outline,
+                    title: 'Profile & Documents',
+                    onTap: () => _go(context, const ProfileScreen()),
+                  ),
+                  MMenuTile(
+                    icon: Icons.logout,
+                    title: 'Logout',
+                    onTap: () async {
+                      if (await mConfirm(context, 'Logout', 'Logout from partner app?', ok: 'Logout')) {
+                        partner.logout();
+                        if (context.mounted) {
+                          Navigator.pushAndRemoveUntil(
+                              context, MaterialPageRoute(builder: (_) => const PartnerWelcomeScreen()), (_) => false);
+                        }
+                      }
+                    },
+                  ),
+                ]),
+              ),
+            ],
+          ),
         ),
       );
 }

@@ -1,70 +1,89 @@
 import 'package:flutter/material.dart';
 import '../theme.dart';
-import '../data.dart';
+import '../state.dart';
 
+/// Add a new offer, or edit [editing] when given.
 class AddOfferScreen extends StatefulWidget {
-  const AddOfferScreen({super.key});
+  final Offer? editing;
+  const AddOfferScreen({super.key, this.editing});
   @override
   State<AddOfferScreen> createState() => _AddOfferScreenState();
 }
 
 class _AddOfferScreenState extends State<AddOfferScreen> {
-  final title = TextEditingController(text: '20% OFF on All Grocery Items');
-  final desc = TextEditingController(text: 'Get 20% discount on all grocery items.');
-  final value = TextEditingController(text: '20');
-  String type = 'Percentage Discount';
-  DateTime valid = DateTime(2026, 10, 31);
+  late final e = widget.editing;
+  late final title = TextEditingController(text: e?.title ?? '');
+  late final desc = TextEditingController(text: e?.description ?? '');
+  late final value = TextEditingController(text: e == null ? '' : e!.value.toStringAsFixed(0));
+  late String type = e?.type ?? 'Percentage Discount';
+  late DateTime valid = _parse(e?.validTill) ?? DateTime.now().add(const Duration(days: 10));
+  late final dateCtrl = TextEditingController(text: _fmt(valid));
 
-  String get _date =>
-      '${valid.day.toString().padLeft(2, '0')}-${valid.month.toString().padLeft(2, '0')}-${valid.year}';
+  static DateTime? _parse(String? s) {
+    if (s == null) return null;
+    final p = s.split('-');
+    if (p.length != 3) return null;
+    return DateTime(int.parse(p[2]), int.parse(p[1]), int.parse(p[0]));
+  }
 
-  InputDecoration _dec({Widget? suffix}) => InputDecoration(
-        isDense: true,
-        suffixIcon: suffix,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: MC.line)),
-        enabledBorder:
-            OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: MC.line)),
-      );
-
-  Widget _label(String t) => Padding(
-        padding: const EdgeInsets.only(top: 16, bottom: 6),
-        child: Text(t, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-      );
+  static String _fmt(DateTime d) =>
+      '${d.day.toString().padLeft(2, '0')}-${d.month.toString().padLeft(2, '0')}-${d.year}';
 
   void _publish() {
+    final v = double.tryParse(value.text);
     if (title.text.trim().isEmpty) {
-      mSnack(context, 'Offer title dite hobe');
+      mSnack(context, 'Please enter offer title');
       return;
     }
-    offers.value = [
-      Offer(
+    if (type != 'Buy 1 Get 1' && (v == null || v <= 0 || (type == 'Percentage Discount' && v > 100))) {
+      mSnack(context, 'Please enter a valid discount value');
+      return;
+    }
+    if (e != null) {
+      e!
+        ..title = title.text.trim()
+        ..description = desc.text.trim()
+        ..type = type
+        ..value = v ?? 0
+        ..validTill = _fmt(valid);
+      biz.updated();
+      mSnack(context, 'Offer updated');
+    } else {
+      biz.addOffer(Offer(
         title: title.text.trim(),
         description: desc.text.trim(),
         type: type,
-        value: double.tryParse(value.text) ?? 0,
-        validTill: _date,
-      ),
-      ...offers.value,
-    ];
-    mSnack(context, 'Offer published!');
+        value: v ?? 0,
+        validTill: _fmt(valid),
+      ));
+      mSnack(context, 'Offer published!');
+    }
     Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(centerTitle: false, title: const Text('Add New Offer', style: TextStyle(fontSize: 16))),
+        appBar: AppBar(
+            centerTitle: false, title: Text(e == null ? 'Add New Offer' : 'Edit Offer', style: const TextStyle(fontSize: 16))),
         body: ListView(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
           children: [
-            _label('Offer Title'),
-            TextField(controller: title, decoration: _dec()),
-            _label('Description'),
-            TextField(controller: desc, maxLines: 2, decoration: _dec()),
-            _label('Discount Type'),
+            MField(label: 'Offer Title', controller: title, hint: '20% OFF on All Grocery Items'),
+            MField(label: 'Description', controller: desc, maxLines: 2, hint: 'Get 20% discount on all grocery items.'),
+            const Padding(
+              padding: EdgeInsets.only(top: 14, bottom: 6),
+              child: Text('Discount Type', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+            ),
             DropdownButtonFormField<String>(
+              // ignore: deprecated_member_use
               value: type,
-              decoration: _dec(),
+              decoration: InputDecoration(
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: MC.line)),
+              ),
               items: const [
                 DropdownMenuItem(value: 'Percentage Discount', child: Text('Percentage Discount')),
                 DropdownMenuItem(value: 'Flat Discount', child: Text('Flat Discount (₹)')),
@@ -72,34 +91,39 @@ class _AddOfferScreenState extends State<AddOfferScreen> {
               ],
               onChanged: (v) => setState(() => type = v!),
             ),
-            _label('Discount Value'),
-            TextField(
-              controller: value,
-              keyboardType: TextInputType.number,
-              decoration: _dec(
+            if (type != 'Buy 1 Get 1')
+              MField(
+                label: 'Discount Value',
+                controller: value,
+                keyboard: TextInputType.number,
+                hint: '20',
                 suffix: Padding(
                   padding: const EdgeInsets.all(14),
                   child: Text(type == 'Flat Discount' ? '₹' : '%', style: const TextStyle(color: MC.sub)),
                 ),
               ),
-            ),
-            _label('Valid Till'),
-            TextField(
+            MField(
+              label: 'Valid Till',
+              controller: dateCtrl,
               readOnly: true,
-              controller: TextEditingController(text: _date),
-              decoration: _dec(suffix: const Icon(Icons.calendar_month_outlined)),
+              suffix: const Icon(Icons.calendar_month_outlined),
               onTap: () async {
                 final d = await showDatePicker(
                   context: context,
                   initialDate: valid,
-                  firstDate: DateTime(2025),
-                  lastDate: DateTime(2030),
+                  firstDate: DateTime.now().subtract(const Duration(days: 1)),
+                  lastDate: DateTime(2035),
                 );
-                if (d != null) setState(() => valid = d);
+                if (d != null) {
+                  setState(() {
+                    valid = d;
+                    dateCtrl.text = _fmt(d);
+                  });
+                }
               },
             ),
             const SizedBox(height: 28),
-            MPrimaryButton(label: 'Publish Offer', onTap: _publish),
+            MPrimaryButton(label: e == null ? 'Publish Offer' : 'Save Changes', onTap: _publish),
           ],
         ),
       );

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import '../theme.dart';
 import '../data.dart';
+import '../state.dart';
+import '../widgets.dart';
 import 'home_screen.dart';
-import 'offer_details_screen.dart';
 
 class LocalShoppingScreen extends StatefulWidget {
   final String initial;
@@ -12,30 +13,58 @@ class LocalShoppingScreen extends StatefulWidget {
 }
 
 class _LocalShoppingScreenState extends State<LocalShoppingScreen> {
-  static const filters = ['All', 'Grocery', 'Restaurant', 'Electronics', 'Beauty', 'Fashion'];
+  static const filters = [
+    'All', 'Grocery', 'Restaurant', 'Electronics', 'Fashion', 'Beauty', 'Pharmacy', 'Home Service'
+  ];
   late String sel = filters.contains(widget.initial) ? widget.initial : 'All';
+  String q = '';
+  String sort = 'Nearest';
+
+  double _km(String d) {
+    final v = double.tryParse(d.split(' ').first) ?? 0;
+    return d.contains('km') ? v : v / 1000;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final list = sel == 'All' ? shops : shops.where((s) => s.category == sel).toList();
+    var list = shops
+        .where((s) => sel == 'All' || s.category == sel)
+        .where((s) => q.isEmpty || '${s.name} ${s.category} ${s.offerNote}'.toLowerCase().contains(q))
+        .toList();
+    list.sort((a, b) => sort == 'Nearest' ? _km(a.distance).compareTo(_km(b.distance)) : b.rating.compareTo(a.rating));
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 64,
-        title: const Column(mainAxisSize: MainAxisSize.min, children: [
-          Text('Local Shopping'),
-          Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(Icons.location_on, size: 13, color: MC.green),
-            Text(' Dubrajpur 731123', style: TextStyle(fontSize: 12, color: MC.sub, fontWeight: FontWeight.w400)),
+        title: ListenableBuilder(
+          listenable: app,
+          builder: (_, __) => Column(mainAxisSize: MainAxisSize.min, children: [
+            const Text('Local Shopping'),
+            InkWell(
+              onTap: () => showLocationPicker(context),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                const Icon(Icons.location_on, size: 13, color: MC.green),
+                Text(' ${app.location}',
+                    style: const TextStyle(fontSize: 12, color: MC.sub, fontWeight: FontWeight.w400)),
+              ]),
+            ),
           ]),
-        ]),
+        ),
         actions: [
-          IconButton(onPressed: () => mSnack(context, 'Cart is empty'), icon: const Icon(Icons.shopping_bag_outlined)),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.sort),
+            initialValue: sort,
+            onSelected: (v) => setState(() => sort = v),
+            itemBuilder: (_) => const [
+              PopupMenuItem(value: 'Nearest', child: Text('Nearest first')),
+              PopupMenuItem(value: 'Top Rated', child: Text('Top rated')),
+            ],
+          ),
         ],
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 4, 16, 20),
         children: [
-          const MSearchBar(hint: 'Search local shops, offers...'),
+          MSearchBar(hint: 'Search local shops, offers...', onChanged: (v) => setState(() => q = v.toLowerCase())),
           const SizedBox(height: 12),
           SizedBox(
             height: 34,
@@ -57,68 +86,18 @@ class _LocalShoppingScreenState extends State<LocalShoppingScreen> {
                         ),
                         child: Text(f,
                             style: TextStyle(
-                                fontSize: 13,
-                                color: sel == f ? Colors.white : MC.text,
-                                fontWeight: FontWeight.w500)),
+                                fontSize: 13, color: sel == f ? Colors.white : MC.text, fontWeight: FontWeight.w500)),
                       ),
                     ),
                   ),
               ],
             ),
           ),
-          const SizedBox(height: 12),
-          if (list.isEmpty)
-            const Padding(
-              padding: EdgeInsets.all(40),
-              child: Center(child: Text('No shops found', style: TextStyle(color: MC.sub))),
-            ),
+          const SizedBox(height: 8),
+          if (list.isEmpty) const MEmpty(icon: Icons.store_outlined, text: 'No shops found'),
           for (final s in list) ShopCard(shop: s),
         ],
       ),
     );
   }
-}
-
-class ShopCard extends StatelessWidget {
-  final Shop shop;
-  const ShopCard({super.key, required this.shop});
-  @override
-  Widget build(BuildContext context) => InkWell(
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => OfferDetailsScreen(shop: shop))),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: MC.line))),
-          child: Row(children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.asset(shop.image, width: 96, height: 78, fit: BoxFit.cover),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(shop.name, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
-                const SizedBox(height: 4),
-                Row(children: [
-                  const Icon(Icons.star_rounded, color: MC.star, size: 16),
-                  Text(' ${shop.rating}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                  Text(' (${shop.reviews})', style: const TextStyle(fontSize: 12, color: MC.sub)),
-                  const SizedBox(width: 12),
-                  const Icon(Icons.location_on_outlined, size: 13, color: MC.sub),
-                  Text(shop.distance, style: const TextStyle(fontSize: 12, color: MC.sub)),
-                ]),
-                const SizedBox(height: 8),
-                Row(children: [
-                  OffBadge(text: shop.offer),
-                  const SizedBox(width: 8),
-                  Flexible(
-                    child: Text(shop.offerNote,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 11, color: MC.red)),
-                  ),
-                ]),
-              ]),
-            ),
-          ]),
-        ),
-      );
 }

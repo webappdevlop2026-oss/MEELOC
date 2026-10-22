@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'theme.dart';
+import 'state.dart';
+import 'sections.dart';
 
 void main() => runApp(const MeelocAdminApp());
 
@@ -10,20 +12,90 @@ class MeelocAdminApp extends StatelessWidget {
         title: 'Meeloc Admin',
         debugShowCheckedModeBanner: false,
         theme: meelocTheme(),
-        home: const AdminHome(),
+        home: ListenableBuilder(
+          listenable: admin,
+          builder: (_, __) => admin.loggedIn ? const AdminHome() : const AdminLogin(),
+        ),
       );
 }
 
-const _menu = [
+class AdminLogin extends StatefulWidget {
+  const AdminLogin({super.key});
+  @override
+  State<AdminLogin> createState() => _AdminLoginState();
+}
+
+class _AdminLoginState extends State<AdminLogin> {
+  final email = TextEditingController(text: 'admin@meeloc.in');
+  final pass = TextEditingController();
+  bool hide = true;
+
+  void _login() {
+    // Demo only: replace with real authentication (Firebase Auth / backend) before going live.
+    if (email.text.trim().isEmpty || pass.text.length < 4) {
+      mSnack(context, 'Enter email and password (demo: any 4+ characters)');
+      return;
+    }
+    admin.login();
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        backgroundColor: MC.adminNavy,
+        body: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      MLogo(size: 34),
+                      SizedBox(width: 10),
+                      Text('Meeloc Admin', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
+                    ]),
+                    const SizedBox(height: 24),
+                    TextField(
+                      controller: email,
+                      decoration: const InputDecoration(labelText: 'Email', border: OutlineInputBorder()),
+                    ),
+                    const SizedBox(height: 14),
+                    TextField(
+                      controller: pass,
+                      obscureText: hide,
+                      onSubmitted: (_) => _login(),
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        border: const OutlineInputBorder(),
+                        suffixIcon: IconButton(
+                          icon: Icon(hide ? Icons.visibility_off : Icons.visibility),
+                          onPressed: () => setState(() => hide = !hide),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    MPrimaryButton(label: 'Login', onTap: _login),
+                  ]),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+}
+
+const menu = [
   (Icons.store_outlined, 'Manage Businesses'),
   (Icons.verified_outlined, 'Manage Offers'),
   (Icons.groups_outlined, 'Manage Delivery Partners'),
   (Icons.campaign_outlined, 'Advertisements'),
   (Icons.bar_chart_outlined, 'Analytics & Reports'),
   (Icons.settings_outlined, 'Settings'),
+  (Icons.person_outline, 'Users'),
 ];
 
-/// Web + mobile responsive admin panel.
 class AdminHome extends StatefulWidget {
   const AdminHome({super.key});
   @override
@@ -33,30 +105,47 @@ class AdminHome extends StatefulWidget {
 class _AdminHomeState extends State<AdminHome> {
   int? section; // null = dashboard
 
+  void _open(int? i) => setState(() => section = i);
+
   @override
   Widget build(BuildContext context) {
     final wide = MediaQuery.of(context).size.width >= 900;
-    final body = section == null ? _Dashboard(onOpen: (i) => setState(() => section = i), wide: wide) : _Section(index: section!);
+    final body = section == null ? Dashboard(onOpen: _open, wide: wide) : sectionView(section!);
     final header = Container(
       color: MC.adminNavy,
-      padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top + 14, 16, 14),
+      padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top + 14, 8, 14),
       child: Row(children: [
         if (section != null && !wide)
-          IconButton(
-            onPressed: () => setState(() => section = null),
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-          ),
+          IconButton(onPressed: () => _open(null), icon: const Icon(Icons.arrow_back, color: Colors.white)),
         const MLogo(icon: Icons.storefront, size: 30),
         const SizedBox(width: 10),
-        const Text('Meeloc Admin', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
+        ListenableBuilder(
+          listenable: admin,
+          builder: (_, __) => Text('${admin.appName} Admin',
+              style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
+        ),
         const Spacer(),
-        const CircleAvatar(radius: 16, backgroundColor: Colors.white24, child: Icon(Icons.person, color: Colors.white, size: 18)),
+        PopupMenuButton<String>(
+          icon: const CircleAvatar(
+              radius: 16, backgroundColor: Colors.white24, child: Icon(Icons.person, color: Colors.white, size: 18)),
+          onSelected: (v) => v == 'logout' ? admin.logout() : _open(5),
+          itemBuilder: (_) => const [
+            PopupMenuItem(value: 'settings', child: Text('Settings')),
+            PopupMenuItem(value: 'logout', child: Text('Logout')),
+          ],
+        ),
       ]),
     );
 
-    if (!wide) {
-      return Scaffold(body: Column(children: [header, Expanded(child: body)]));
-    }
+    final page = PopScope(
+      canPop: section == null,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _open(null);
+      },
+      child: body,
+    );
+
+    if (!wide) return Scaffold(body: Column(children: [header, Expanded(child: page)]));
     return Scaffold(
       body: Column(children: [
         header,
@@ -71,128 +160,22 @@ class _AdminHomeState extends State<AdminHome> {
                   selectedColor: MC.green,
                   leading: const Icon(Icons.dashboard_outlined),
                   title: const Text('Dashboard'),
-                  onTap: () => setState(() => section = null),
+                  onTap: () => _open(null),
                 ),
-                for (int i = 0; i < _menu.length; i++)
+                for (int i = 0; i < menu.length; i++)
                   ListTile(
                     selected: section == i,
                     selectedColor: MC.green,
-                    leading: Icon(_menu[i].$1),
-                    title: Text(_menu[i].$2),
-                    onTap: () => setState(() => section = i),
+                    leading: Icon(menu[i].$1),
+                    title: Text(menu[i].$2),
+                    onTap: () => _open(i),
                   ),
               ]),
             ),
-            Expanded(child: body),
+            Expanded(child: page),
           ]),
         ),
       ]),
-    );
-  }
-}
-
-class _Dashboard extends StatelessWidget {
-  final ValueChanged<int> onOpen;
-  final bool wide;
-  const _Dashboard({required this.onOpen, required this.wide});
-
-  @override
-  Widget build(BuildContext context) {
-    const stats = [
-      (Icons.person, Color(0xFF7C5CFC), Color(0xFFF1EDFF), 'Total Users', '1,245'),
-      (Icons.storefront, Color(0xFF22B07D), Color(0xFFE6F7F0), 'Businesses', '328'),
-      (Icons.delivery_dining, Color(0xFFE5488A), Color(0xFFFDEBF3), 'Delivery Partners', '156'),
-      (Icons.local_offer, Color(0xFFF26A3D), Color(0xFFFEEEE8), 'Total Offers', '892'),
-    ];
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        GridView.count(
-          crossAxisCount: wide ? 4 : 2,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          childAspectRatio: wide ? 2.6 : 2.0,
-          children: [
-            for (final s in stats)
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: s.$3, borderRadius: BorderRadius.circular(10)),
-                child: Row(children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(color: s.$2, borderRadius: BorderRadius.circular(8)),
-                    child: Icon(s.$1, color: Colors.white, size: 20),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(s.$4, style: const TextStyle(fontSize: 12, color: MC.text), maxLines: 1, overflow: TextOverflow.ellipsis),
-                        Text(s.$5, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
-                      ],
-                    ),
-                  ),
-                ]),
-              ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Container(
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), border: Border.all(color: MC.line)),
-          clipBehavior: Clip.antiAlias,
-          child: Column(children: [
-            for (int i = 0; i < _menu.length; i++)
-              MMenuTile(icon: _menu[i].$1, title: _menu[i].$2, onTap: () => onOpen(i)),
-          ]),
-        ),
-      ],
-    );
-  }
-}
-
-class _Section extends StatelessWidget {
-  final int index;
-  const _Section({required this.index});
-
-  @override
-  Widget build(BuildContext context) {
-    final title = _menu[index].$2;
-    final rows = switch (index) {
-      0 => ['Fresh Mart Grocery', 'Bapi Electronics', 'Tasty Bite Restaurant', 'Style Salon'],
-      1 => ['20% OFF – Fresh Mart', '10% OFF – Bapi Electronics', 'Flat 15% OFF – Tasty Bite', '30% OFF – Style Salon'],
-      2 => ['Rahul Mondal', 'Sourav Ghosh', 'Amit Sheikh', 'Bikash Roy'],
-      3 => ['Home Banner – Local Deals', 'Online – Big Billion'],
-      4 => ['Daily Report', 'Weekly Report', 'Monthly Report'],
-      _ => ['App Name', 'Service Area', 'Commission %', 'Notifications'],
-    };
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-        const SizedBox(height: 12),
-        for (final r in rows)
-          Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: const BorderSide(color: MC.line)),
-            child: ListTile(
-              title: Text(r),
-              trailing: index <= 2
-                  ? Row(mainAxisSize: MainAxisSize.min, children: [
-                      TextButton(onPressed: () => mSnack(context, '$r approved'), child: const Text('Approve')),
-                      TextButton(
-                        onPressed: () => mSnack(context, '$r blocked'),
-                        child: const Text('Block', style: TextStyle(color: MC.red)),
-                      ),
-                    ])
-                  : const Icon(Icons.chevron_right),
-            ),
-          ),
-      ],
     );
   }
 }

@@ -1,0 +1,92 @@
+name: Build Meeloc apps
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  android:
+    name: APK - ${{ matrix.app }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - app: customer_app
+            label: Meeloc
+          - app: business_app
+            label: Meeloc Business
+          - app: delivery_partner_app
+            label: Meeloc Partner
+    defaults:
+      run:
+        working-directory: ${{ matrix.app }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Generate Android project
+        run: |
+          flutter create . --platforms android --org in.meeloc
+          sed -i 's/android:label="[^"]*"/android:label="${{ matrix.label }}"/' android/app/src/main/AndroidManifest.xml
+      - run: flutter pub get
+      - run: flutter analyze --no-fatal-infos --no-fatal-warnings
+      - run: flutter build apk --release
+      - run: cp build/app/outputs/flutter-apk/app-release.apk ../meeloc-${{ matrix.app }}.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: meeloc-${{ matrix.app }}
+          path: meeloc-${{ matrix.app }}.apk
+
+  admin-web:
+    name: Web - admin_panel
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: admin_panel
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter create . --platforms web --org in.meeloc
+      - run: flutter pub get
+      - run: flutter analyze --no-fatal-infos --no-fatal-warnings
+      - run: flutter build web --release
+      - run: cd build/web && zip -r ../../../meeloc-admin-web.zip .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: meeloc-admin-web
+          path: meeloc-admin-web.zip
+
+  release:
+    name: Publish release
+    needs: [android, admin-web]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: out
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Meeloc build ${{ github.run_number }}
+          body: |
+            Meeloc apps – automatic build from `${{ github.sha }}`.
+            - meeloc-customer_app.apk – Customer app
+            - meeloc-business_app.apk – Business (Seller) app
+            - meeloc-delivery_partner_app.apk – Delivery Partner app
+            - meeloc-admin-web.zip – Web Admin Panel (upload to any static host)
+          files: out/*
