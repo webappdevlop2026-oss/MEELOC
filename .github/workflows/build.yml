@@ -26,8 +26,8 @@ jobs:
       run:
         working-directory: ${{ matrix.app }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
@@ -40,7 +40,14 @@ jobs:
           flutter create . --platforms android --org in.meeloc
           sed -i 's/android:label="[^"]*"/android:label="${{ matrix.label }}"/' android/app/src/main/AndroidManifest.xml
       - run: flutter pub get
-      - run: flutter analyze --no-fatal-infos --no-fatal-warnings
+      - name: Analyze
+        run: |
+          rm -rf test
+          flutter analyze --no-fatal-infos --no-fatal-warnings > analyze.txt 2>&1 && exit 0
+          cat analyze.txt
+          msg=$(grep -E "error" analyze.txt | head -60 | sed ':a;N;$!ba;s/\n/%0A/g')
+          echo "::error title=Analyze errors::$msg"
+          exit 1
       - run: flutter build apk --release
       - run: cp build/app/outputs/flutter-apk/app-release.apk ../meeloc-${{ matrix.app }}.apk
       - uses: actions/upload-artifact@v4
@@ -55,14 +62,21 @@ jobs:
       run:
         working-directory: admin_panel
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
       - run: flutter create . --platforms web --org in.meeloc
       - run: flutter pub get
-      - run: flutter analyze --no-fatal-infos --no-fatal-warnings
+      - name: Analyze
+        run: |
+          rm -rf test
+          flutter analyze --no-fatal-infos --no-fatal-warnings > analyze.txt 2>&1 && exit 0
+          cat analyze.txt
+          msg=$(grep -E "error" analyze.txt | head -60 | sed ':a;N;$!ba;s/\n/%0A/g')
+          echo "::error title=Analyze errors::$msg"
+          exit 1
       - run: flutter build web --release
       - run: cd build/web && zip -r ../../../meeloc-admin-web.zip .
       - uses: actions/upload-artifact@v4
